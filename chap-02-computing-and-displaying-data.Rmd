@@ -9,7 +9,7 @@ bookauthors: "Schmidt, W.; Völschow, M"
 bookaddres: "Switzerland"
 bookpublisher: "Springer"
 bookyear: "2021"
-chaptertitle: "Computing and Displaying Data"
+chaptertitle: "Computação e exibição de dados"
 chapternumber: "2"
 maincolor: "004776"
 
@@ -23,6 +23,10 @@ knitr::opts_chunk$set(echo = TRUE)
 library(reticulate)
 use_python("~/anaconda3/envs/science/bin/python")
 ```
+
+
+\noindent\textbf{Resumo do capítulo}: Os arrays do NumPy são essenciais para cálculos numéricos em Python, estendendo suas capacidades numéricas de forma notável. Por exemplo, eles podem ser usados como variáveis simples para avaliar uma expressão aritmética para muitos valores diferentes sem precisar programar um loop. Na primeira seção, combinamos o poder do NumPy e do Astropy para calcular as posições de objetos na esfera celeste. Além disso, introduzimos o Matplotlib para produzir gráficos a partir de dados de arrays. Outras aplicações são mostradas no contexto das leis de Kepler e forças de maré, como a impressão de tabelas formatadas e a plotagem de mapas vetoriais. 
+
 
 \begin{enumerate}
   \item \textbf{(FEI-SP)} Dois móveis $A$ e $B$, ambos com movimento uniforme, percorrem uma trajetória retilínea conforme mostra a figura. Em $t = 0$, estes se encontram, respectivamente, nos pontos $A$ e $B$ na trajetória. As velocidades dos móveis são $v_A = 50$ m/s e $v_B = 30$ m/s no mesmo sentido.
