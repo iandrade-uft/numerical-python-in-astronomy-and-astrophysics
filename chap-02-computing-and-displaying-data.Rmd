@@ -29,14 +29,14 @@ use_python("~/anaconda3/envs/astro39/bin/python")
 
 \section{Astronomia Esférica}
 
+
+Esfera celeste com coordenadas $\alpha$ (ascensão reta) e $\delta$ (declinação) de um objeto estelar. O plano orbital da Terra (eclíptica) intersecta a esfera ao longo do círculo vermelho, que é inclinado pelo ângulo $\varepsilon$ (obliquidade) em relação ao equador celeste. O equador celeste é a projeção externa do equador da Terra na esfera celeste. Os pontos de interseção da eclíptica e do equador celeste são os dois equinócios.
+
 \begin{figure}[H]
   \centering
   \caption{Esfera Celeste}
   \includegraphics[width=0.6\textwidth]{figure/chap-02/fig-2-1.png}
 \end{figure}
-
-
-Esfera celeste com coordenadas $\alpha$ (ascensão reta) e $\delta$ (declinação) de um objeto estelar. O plano orbital da Terra (eclíptica) intersecta a esfera ao longo do círculo vermelho, que é inclinado pelo ângulo $\varepsilon$ (obliquidade) em relação ao equador celeste. O equador celeste é a projeção externa do equador da Terra na esfera celeste. Os pontos de interseção da eclíptica e do equador celeste são os dois equinócios.
 
 \subsection{Declinação do Sol}
 
@@ -48,11 +48,11 @@ obliq = 23.44
 Enquanto a declinação das estrelas é constante, a posição do sol muda no sistema equatorial no decorrer do período de um ano. Isso decorre da inclinação do eixo de rotação da Terra em relação à direção perpendicular da eclípica, a qual é denominada obliquidade e vale $\epsilon_0 = `r format(py$obliq, decimal.mark=",")`^\circ$.A variação anual da declinação do Sol é dada por
 
 $$
-\delta = - \arcsin{\left[\sin{\epsilon_0} \cos{\left(\dfrac{360^\circ}{365.24}(N + 10)\right) }\right]}
+\delta_{\odot} = - \arcsin{\left[\sin{\epsilon_0} \cos{\left(\dfrac{360^\circ}{365.24}(N + 10)\right) }\right]}
 $$
  em que $N$ é a quandidade de dias a partir de 1º de janeiro.
  
-**Exemplo**
+\noindent\textbf{Exemplo:}
 
 ```{python}
 # Biblioteca importada
@@ -67,125 +67,108 @@ ecl = math.radians(obliq) # obliquidade da eclípitica em rad
 delta = -math.asin(math.sin(ecl) * math.cos(omega*(N+10)))
 ```
 
-Resultado: Declinação do Sol em 20 de junho de 2020: $\delta = `r format((180/pi)*py$delta, nsmall=2, digits=2, decimal.mark=",")`^\circ$
+Resultado: Declinação do Sol em 20 de junho de 2020: $\delta_{\odot} = `r format((180/pi)*py$delta, nsmall=2, digits=2, decimal.mark=",")`^\circ$
  
 
+\subsection{Arco Diurnal}
 
+Denomina-se \textbf{arco diurnal} ao arco descrito na esfera celeste por um objeto em movimento.
 
+\begin{figure}[H]
+  \centering
+  \caption{Arco Diurnal}
+  \includegraphics[width=0.6\textwidth]{figure/chap-02/fig-2-3.png}
+\end{figure}
 
+Arco diurno de uma estrela movendo-se ao redor da esfera celeste (círculo vermelho espesso) no sistema horizontal de um observador na latitude $\phi$ (o plano horizontal é mostrado em cinza). Como o plano equatorial está inclinado pelo ângulo $90^\circ - \phi$ em relação ao plano horizontal, a culminação superior da estrela no meridiano é dada por $a_{\text{max}} = 90^\circ - \phi + \delta$, onde $\delta$ é a declinação. No sistema corotacional, a estrela nasce no ângulo horário $h_{\text{rise}}$, atinge sua maior altitude quando cruza o meridiano em $h = 0$, e se põe no horizonte em $h_{\text{set}} = -h_{\text{rise}}$.
 
+$$
+\cos{h_{\text{set}}} = -\tan{\delta} \tan{\phi},
+$$
+em que $\delta$ é a declinação d objeto e $\phi$ é a latitude da posição do observador na Terra.
 
+\noindent\textbf{Exemplo:}
 
-\begin{enumerate}
-  \item \textbf{(FEI-SP)} Dois móveis $A$ e $B$, ambos com movimento uniforme, percorrem uma trajetória retilínea conforme mostra a figura. Em $t = 0$, estes se encontram, respectivamente, nos pontos $A$ e $B$ na trajetória. As velocidades dos móveis são $v_A = 50$ m/s e $v_B = 30$ m/s no mesmo sentido.
-  
-
-  
-  \begin{figure}[H]
-    \centering
-    \begin{tikzpicture}
-      \draw[-latex] (-0.5, 0) -- (8, 0);
-      \foreach \i/\x/\y/\cor in {0/0/2/black, A/2/1.5/red, B/6/2/red}{
-        \draw[dashed] (\x, 0) -- (\x, \y);
-        \draw[\cor, thick] (\x, 0.1) -- (\x, -0.1) node[below, black] {$\i$};
-      }
-      \foreach \i/\x/\y in {50/2/1.5, 150/6/2}{
-        \draw[latex-latex] (0, \y) -- (\x, \y) node[midway, above] {$\i$ m};
-      }
-    \end{tikzpicture}
-  \end{figure}
-  
-  Em que instante a distância entre os dois móveis será 50 m?
-  \begin{enumerate}[label=(\alph*)]
-    \foreach \resp in {200, 225, 250, 300, 350} {
-      \item $\resp$ m
-    }
-  \end{enumerate}
-  
-  \iniSol
-  
-
-
-  
-  Escrevamos as equações horárias das trajétórias dos móveis $A$ e $B$, sabendo que ambos descrevem movimento uniforme:
-  
-  \begin{align*}
-    \begin{cases}
-      s_A = s_{0A} + v_A t\\
-      s_B = s_{0B} + v_B t\\
-    \end{cases}
-  \end{align*}
-  
-  Os móveis encontram-se no instante $t^{*}$ tal que $s_A = s_B = s^{*}$, ou seja:
-  \begin{align*}
-    s_A = s_B &\Rightarrow s_{0A} + v_A t^{*} = s_{0B} + v_B t^{*}\\
-    &\Rightarrow v_A t^{*} - v_B t^{*} = s_{0B} - s_{0A}\\
-    &\Rightarrow (v_A  - v_B) t^{*} = s_{0B} - s_{0A}\\
-    &\Rightarrow t^{*} = \dfrac{s_{0B} - s_{0A}}{v_A  - v_B}
-  \end{align*}
-  
-  Nesse instante, a posição $s^{*}$ dos móveis será:
-  
-  \begin{align*}
-    s^{*} = s_{0A} + v_A t^{*} \Rightarrow s^{*} = s_{0A} + v_A \left( \dfrac{s_{0B} - s_{0A}}{v_A  - v_B} \right)
-  \end{align*}
-  
-  
-  O script \verb|Python| abaixo mostra o resultano numérico correspondente ao desenvolvimento algébrico acima:
-\end{enumerate}
+Consideremos a estrela Betelgeuse na constelação de Orion. É uma gigante vermelha que está entre as estrelas mais brilhantes do céu. Sua declinação pode ser obtida com a ajuda de \verb|astropy.coordinates|, o qual oferece uma função que pesquisa pelo nome de um objeto em bancos de dados online:
 
 ```{python}
-# Dados do problema
-s_0A = 50
-v_A = 50
-s_0B = 150
-v_B = 30
+from astropy.coordinates import SkyCoord, EarthLocation
 
-# Instante do encontro
-t_star = (s_0B - s_0A) / (v_A - v_B)
+betelgeuse = SkyCoord.from_name('Betelgeuse')
+table = ""
+table += 46 * "="
+table += "\n"
+table += f"{'Name':>12s} | {'RA':>16s} | {'dec':>12s}\n"
+table += 46 * "-"
+table += "\n"
+table += f"{'Betelgeuse':>12s} | {betelgeuse.ra:>16s} | {betelgeuse.dec:>12s}\n"
+table += 46 * "="
+print(table)
 
-# Posição do encontro
-s_star = s_0A + v_A * t_star
+delta = betelgeuse.dec
+print(delta)
 ```
 
+Suponhamos que desejamos determinar o comprimento do arco diurnal de Betelgeuse visto do Observatório de Hamburg ($\phi \approx +53^\circ 28^{'} 49^{''}$).
 
-  Os móveis encontram-se no instante $t^{*} = `r format(py$t_star, decimal.mark=",")`$ s e na posição $s^{*} = `r format(py$s_star, decimal.mark=",")`$ m.
-  
+```{python}
+import math
+import astropy.units as u
 
-  O gráfico abaixo mostra a posição de cada móvel em função do tempo, bem como o ponto de encontro.
-  
-```{python, include=FALSE}
+# posição georáfica do observador
+obs = EarthLocation(
+  lat=53*u.deg + 28*u.arcmin + 49*u.arcsec,
+  lon=10*u.deg + 14*u.arcmin + 23*u.arcsec,
+)
+
+# Latitude
+phi = obs.lat
+
+# h
+h = math.acos(-math.tan(delta.radian) * math.tan(phi.radian))
+
+# T
+T = (math.degrees(2*h)/360) * u.sday
+
+print(f"T = {T.to(u.h):.2f} (em dias siderais).")
+```
+
+\noindent\textbf{Exemplo:} Variação do arco diurnal do Sol durante o ano 
+
+
+
+```{python}
+# Bibliotecas importadas
+import math
 import numpy as np
-t = np.array([0, t_star, 1.5*t_star])
-s_A = s_0A + v_A * t
-s_B = s_0B + v_B * t
+import matplotlib.pyplot as plt
+import astropy.units as u
+from astropy.coordinates import SkyCoord, EarthLocation
 
-t_lim = [np.min(t)-t_star/3, np.max(t)+t_star/2]
-s_lim = [-s_0A, np.max([np.max(s_A), np.max(s_B)]) + s_0A]
+N = np.arange(364) # Array com elementos 0, 1, 2, ...,364
+omega = 2*math.pi/365.24 # Velocidade angular da Terra em rad/dia
+ecl = math.radians(23.44) # obliquidade da eclíptica em radianos
+
+# Cálculo da declinação do Sol para todos os dias do ano
+delta = -np.arcsin(math.sin(ecl) * np.cos(omega*(N+10)))
+
+# Cálculo do comprimento do dia em horas solares
+h = np.arccos(-np.tan(delta) * math.tan(phi.radian))
+T = (np.degrees(2*h)/360) * u.sday.to(u.h)
+
+# Gráfico
+plt.plot(N, T)
+plt.xlabel("Dia")
+plt.ylabel("Comprimento do dia (h)")
+plt.grid(ls='dashed')
+plt.savefig('figure/chap-02/day-length.pdf')
+plt.close()
 ```
 
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[x=0.5cm, y=0.01cm]
-    % Eixo X
-    \draw[-latex] (`r py$t_lim[1]`, 0) -- (`r py$t_lim[2]`, 0) node[below] {$t$ (s)};
-    % Eixo Y
-    \draw[-latex] (0, `r py$s_lim[1]`) -- (0, `r py$s_lim[2]`) node[left] {$s$ (m)};
-    % Função Horária de A
-    \draw[red, thick] (`r py$t[1]`, `r py$s_A[1]`) -- (`r py$t[3]`, `r py$s_A[3]`) node[right, yshift=5pt, black] {$\textbf{A}$};
-    \draw[thick] (4pt, `r py$s_0A`) -- (-4pt, `r py$s_0A`) node[left] {$`r py$s_0A`$};
-    % Função Horária de B
-    \draw[blue, thick] (`r py$t[1]`, `r py$s_B[1]`) -- (`r py$t[3]`, `r py$s_B[3]`) node[right, yshift=-2pt , black] {$\textbf{B}$};
-    \draw[thick] (4pt, `r py$s_0B`) -- (-4pt, `r py$s_0B`) node[left] {$`r py$s_0B`$};
-    % Ponto de encontro
-    \draw[dashed] (`r py$t_star`, 0) -- (`r py$t_star`, `r py$s_star`) -- (0, `r py$s_star`);
-    \draw[thick] (`r py$t_star`, 4pt) -- (`r py$t_star`, -4pt) node[below] {$t^{*} = `r py$t_star`$};
-    \draw[thick] (4pt, `r py$s_star`) -- (-4pt, `r py$s_star`) node[left] {$`r py$s_star`$};
-  \end{tikzpicture}
+  \caption{Variação do arco diurnal Solar durante o ano}
+  \includegraphics[width=0.8\textwidth]{figure/chap-02/day-length.pdf}
 \end{figure}
 
 
-
-Portanto, a resposta correta é letra \textbf{D}.
-
-\fimSol
