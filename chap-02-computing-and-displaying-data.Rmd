@@ -21,15 +21,65 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(reticulate)
-use_python("~/anaconda3/envs/science/bin/python")
+use_python("~/anaconda3/envs/astro39/bin/python")
 ```
 
 
 \noindent\textbf{Resumo do capítulo}: Os arrays do NumPy são essenciais para cálculos numéricos em Python, estendendo suas capacidades numéricas de forma notável. Por exemplo, eles podem ser usados como variáveis simples para avaliar uma expressão aritmética para muitos valores diferentes sem precisar programar um loop. Na primeira seção, combinamos o poder do NumPy e do Astropy para calcular as posições de objetos na esfera celeste. Além disso, introduzimos o Matplotlib para produzir gráficos a partir de dados de arrays. Outras aplicações são mostradas no contexto das leis de Kepler e forças de maré, como a impressão de tabelas formatadas e a plotagem de mapas vetoriais. 
 
+\section{Astronomia Esférica}
+
+\begin{figure}[H]
+  \centering
+  \caption{Esfera Celeste}
+  \includegraphics[width=0.6\textwidth]{figure/chap-02/fig-2-1.png}
+\end{figure}
+
+
+Esfera celeste com coordenadas $\alpha$ (ascensão reta) e $\delta$ (declinação) de um objeto estelar. O plano orbital da Terra (eclíptica) intersecta a esfera ao longo do círculo vermelho, que é inclinado pelo ângulo $\varepsilon$ (obliquidade) em relação ao equador celeste. O equador celeste é a projeção externa do equador da Terra na esfera celeste. Os pontos de interseção da eclíptica e do equador celeste são os dois equinócios.
+
+\subsection{Declinação do Sol}
+
+```{python, include=FALSE}
+obliq = 23.44
+```
+
+
+Enquanto a declinação das estrelas é constante, a posição do sol muda no sistema equatorial no decorrer do período de um ano. Isso decorre da inclinação do eixo de rotação da Terra em relação à direção perpendicular da eclípica, a qual é denominada obliquidade e vale $\epsilon_0 = `r format(py$obliq, decimal.mark=",")`^\circ$.A variação anual da declinação do Sol é dada por
+
+$$
+\delta = - \arcsin{\left[\sin{\epsilon_0} \cos{\left(\dfrac{360^\circ}{365.24}(N + 10)\right) }\right]}
+$$
+ em que $N$ é a quandidade de dias a partir de 1º de janeiro.
+ 
+**Exemplo**
+
+```{python}
+# Biblioteca importada
+import math
+
+# Dados do exemplo
+N = 171 # dia do primeiro solstício
+omega = 2*math.pi/365.24 # velocidade angular em rad/dia
+ecl = math.radians(obliq) # obliquidade da eclípitica em rad
+
+# Aproximação para a declinação do Sol
+delta = -math.asin(math.sin(ecl) * math.cos(omega*(N+10)))
+```
+
+Resultado: Declinação do Sol em 20 de junho de 2020: $\delta = `r format((180/pi)*py$delta, nsmall=2, digits=2, decimal.mark=",")`^\circ$
+ 
+
+
+
+
+
+
 
 \begin{enumerate}
   \item \textbf{(FEI-SP)} Dois móveis $A$ e $B$, ambos com movimento uniforme, percorrem uma trajetória retilínea conforme mostra a figura. Em $t = 0$, estes se encontram, respectivamente, nos pontos $A$ e $B$ na trajetória. As velocidades dos móveis são $v_A = 50$ m/s e $v_B = 30$ m/s no mesmo sentido.
+  
+
   
   \begin{figure}[H]
     \centering
