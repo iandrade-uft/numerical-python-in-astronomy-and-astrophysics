@@ -101,6 +101,63 @@ N = np.array([
 ])
 print(N)
 ```
+\fimSol
+
+\begin{enumerate}[resume]
+  \item Uma fórmula mais precisa para a declinação do Sol leva em consideração a excentricidade $e = 0.0167$ da órbita da Terra:
+  $$
+    \delta_{\odot} = -\arcsin{\left[\sin{(\epsilon_0)} \cos{\left(\dfrac{360^\circ}{365.24} (N+10) + e\dfrac{360^\circ}{\pi} \sin{\left(\dfrac{360^\circ}{365.24}(N-2)\right)}\right)}\right]}
+  $$
+  
+  Calcule a declinação assumindo uma órbita circular (Eq. 2.1), a declinação resultante da fórmula acima, a diferença entre esses valores, e o desvio relativo da aproximação circular em \% para equinócios e solstícios e liste seus resultados em uma tabela. Certifique-se de que um número adequado de dígitos seja exibido para comparar as fórmulas.
+\end{enumerate}
+
+\iniSol
+```{python}
+# Bibliotecas necessárias
+import math
+import numpy as np
+import datetime
+
+# Função auxiliar
+def sun_declination(N, ecl, omega, e=0.0):
+  delta = -np.arcsin(
+    math.sin(ecl) * np.cos(omega*(N+10) + 2*e*np.sin(omega*(N-2)))
+  )
+  return delta
+
+# Dados do problema
+ecl = math.radians(23.44)
+omega = 2*math.pi/365.24
+e=0.0167
+
+year = 2024
+jan1st = datetime.date(year,1,1)
+eventos = [
+  {"nome": "Equinócio de outono", "data": datetime.date(year,3,20)},
+  {"nome": "Solstício de inverno", "data": datetime.date(year,6,20)},
+  {"nome": "Equinócio de primavera", "data": datetime.date(year,9,22)},
+  {"nome": "Solstício de verão", "data": datetime.date(year,12,21)}
+]
+tbl_header = f"{f'Evento ({year})':<30s} {'Decl. (Órb. Circular)':<20s} {'Decl. (Órb. Elíptica)':<20s} {'Erro (%)':>10s}"
+
+tbl = "="*len(tbl_header) + "\n"
+tbl += tbl_header + "\n"
+tbl += "-"*len(tbl_header) + "\n"
+
+for evento in eventos:
+  N = (evento['data'] - jan1st).days
+  delta_circ = sun_declination(N=N, ecl=ecl, omega=omega, e=0.0)
+  delta_elipse = sun_declination(N=N, ecl=ecl, omega=omega, e=e)
+  erro = (delta_circ-delta_elipse)/delta_elipse
+  row = f"""{f"{evento['nome']} ({evento['data'].strftime('%d/%m')})":<30s} """ + f"{math.degrees(delta_circ):>20.2f}° " + \
+        f"{math.degrees(delta_elipse):>20.2f}° " + f"{erro:>10.2%}"
+  tbl += row + "\n"
+tbl += "="*len(tbl_header)
+
+
+print(tbl)
+```
 
 \fimSol
 
