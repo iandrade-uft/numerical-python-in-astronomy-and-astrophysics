@@ -50,7 +50,7 @@ Enquanto a declinação das estrelas é constante, a posição do sol muda no si
 $$
 \delta_{\odot} = - \arcsin{\left[\sin{\epsilon_0} \cos{\left(\dfrac{360^\circ}{365.24}(N + 10)\right) }\right]}
 $$
- em que $N$ é a quandidade de dias a partir de 1º de janeiro.
+ em que $N$ é a quandidade de dias a partir de 1° de janeiro.
  
 \noindent\textbf{Exemplo:}
 
@@ -85,7 +85,7 @@ Arco diurno de uma estrela movendo-se ao redor da esfera celeste (círculo verme
 $$
 \cos{h_{\text{set}}} = -\tan{\delta} \tan{\phi},
 $$
-em que $\delta$ é a declinação d objeto e $\phi$ é a latitude da posição do observador na Terra.
+em que $\delta$ é a declinação do objeto e $\phi$ é a latitude da posição do observador na Terra.
 
 \noindent\textbf{Exemplo:}
 
@@ -140,6 +140,7 @@ print(f"T = {T.to(u.h):.2f} (em dias siderais).")
 ```{python}
 # Bibliotecas importadas
 import math
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
@@ -161,6 +162,7 @@ plt.plot(N, T)
 plt.xlabel("Dia")
 plt.ylabel("Comprimento do dia (h)")
 plt.grid(ls='dashed')
+plt.tight_layout()
 plt.savefig('figure/chap-02/day-length.pdf')
 plt.close()
 ```
@@ -170,5 +172,221 @@ plt.close()
   \caption{Variação do arco diurnal Solar durante o ano}
   \includegraphics[width=0.8\textwidth]{figure/chap-02/day-length.pdf}
 \end{figure}
+
+\subsubsection{Arco diurnal para três cidades brasileiras}
+
+Vamos determinar a variação do arco diurnal do Sol para três cidades brasileiras: Teresina-PI, Palmas-TO e São Paulo-SP:
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{lrr}
+    \hline
+    \textbf{Cidade} & \textbf{Latitude (DMS)} & \textbf{Longitude (DMS)}\\ \hline
+    Teresina-PI & 5° 5' 31" S & 42° 48' 13" W\\
+    Palmas-TO & 10° 10' 42" S & 48° 19' 47" W\\
+    São Paulo-SP & 23° 32' 0" S & 46° 37' 59" W\\ \hline
+  \end{tabular}
+\end{table}
+
+```{python, results='hide'}
+import numpy as np
+from datetime import datetime, timedelta
+import matplotlib.dates as mdates
+plt.rcParams['font.family'] = 'monospace'
+
+cidades = [
+  {
+    "nome": "Macapá-AP",
+    "lat": (0,2,34),
+    "lon": (51,3,37),
+  },
+  {
+    "nome": "Teresina-PI",
+    "lat": (-5,-5,-31),
+    "lon": (-42,-48,-13),
+  },
+  {
+    "nome": "Palmas-TO",
+    "lat": (-10,-10,-42),
+    "lon": (-48,-419,-47),
+  },
+  {
+    "nome": "São Paulo-SP",
+    "lat": (-23,-32,0),
+    "lon": (-46,-37,-59),
+  },
+  {
+    "nome": "Porto Alegre-RS",
+    "lat": (-30,-1,-59),
+    "lon": (-51,-13,-48),
+  }
+]
+
+eventos = [
+    "Solstício de Verão", 
+    "Equinócio de Outono", 
+    "Solstício de Inverno", 
+    "Equinócio de Primavera"
+  ]
+datas = [
+    datetime(2024,12,21),
+    datetime(2024,3,21),
+    datetime(2024,6,22),
+    datetime(2024,9,22)
+]
+
+def get_diaurnal_arc(cidade_dic, N = np.arange(364)):
+  omega = 2*math.pi/365.24
+  ecl = math.radians(23.44)
+  delta = -np.arcsin(math.sin(ecl) * np.cos(omega*(N+10)))
+  obs = EarthLocation(
+    lat=cidade['lat'][0]*u.deg + cidade['lat'][1]*u.arcmin + cidade['lat'][2]*u.arcsec,
+    lon=cidade['lon'][0]*u.deg + cidade['lon'][1]*u.arcmin + cidade['lon'][2]*u.arcsec
+  )
+  phi = obs.lat
+  h = np.arccos(-np.tan(delta) * math.tan(phi.radian))
+  T = (np.degrees(2*h)/360 * u.sday.to(u.h))
+  return T
+
+# Define start and end dates
+start_date = datetime(2024, 1, 1)
+end_date = datetime(2024, 12, 31)
+
+# Calculate the number of days between start_date and end_date
+num_days = (end_date - start_date).days + 1
+
+# Create a numpy array of dates
+date_array = np.array([start_date + timedelta(days=i) for i in range(num_days)])
+
+
+N = np.arange(len(date_array))
+cores = ["blueviolet", "seagreen", "sandybrown", "steelblue", "salmon", "darkslateblue"]
+plt.figure(figsize=(8, 4.5))
+for i, cidade in enumerate(cidades):
+  cor = cores[i]
+  T = get_diaurnal_arc(cidade, N)
+  label=f"{cidade['nome']:<15s} Lat.: " + \
+    "".join([f"{abs(li):02d}{s}" for li, s in zip(cidade['lat'], ['°', '\'', '\"'])])
+  label += "N" if cidade['lat'][2]>=0 else "S"
+  plt.plot(
+      date_array, T, c=cor, label=label
+    )
+
+for evento, data in zip(eventos, datas):
+  plt.text(
+      data, plt.gca().get_ylim()[1]*0.72, evento, rotation=90,
+      horizontalalignment='right', verticalalignment='bottom',
+      bbox=dict(facecolor='white', edgecolor='none', alpha=0.5)
+    )
+  plt.axvline(x=data, color='k', linestyle='--', linewidth=1)
+
+plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b/%Y'))  
+# %b para mostrar abreviações dos meses
+plt.xticks(rotation=45);
+plt.xlabel("Data")
+plt.ylabel("Duração do dia (h)")
+plt.grid(ls="dashed")
+plt.legend(loc='upper center')
+plt.tight_layout()
+plt.savefig("figure/chap-02/arco-diurnal-cidades-br.pdf")
+plt.close()
+```
+
+\begin{figure}[H]
+  \centering
+  \caption{Duração do dia ao longo do ano para três cidades brasileiras}
+  \includegraphics[width=\textwidth]{figure/chap-02/arco-diurnal-cidades-br.pdf}
+\end{figure}
+
+\newpage
+\subsection{Observação de Objetos Celestes}
+
+```{python, results='hide'}
+import astropy.units as u
+from astropy.coordinates import \
+  SkyCoord, EarthLocation, AltAz, get_sun
+  
+# Posição geográfica do observador
+obs = EarthLocation(
+  lat=(-10)*u.deg + (-10)*u.arcmin + (-42)*u.arcsec,
+  lon=(-48)*u.deg + (-19)*u.arcmin + (-47)*u.arcsec
+)
+
+# latitude do observador
+phi = obs.lat
+```
+
+Conforme utilzação do código acima, a latitude em Palmas-TO vale `r py$phi`.
+
+```{python, results='hide'}
+from astropy.time import Time
+
+utc_shift = 2*u.hour # CEST time zone (+2h)
+noon_cest = Time("2024-07-25 12:00:00") - utc_shift
+```
+
+```{python, results='hide'}
+elapsed = np.arange(0, 24*60, 5) * u.min
+time = noon_cest + elapsed
+frame_local_24h = AltAz(obstime=time, location=obs)
+```
+
+```{python, results='hide'}
+# estrela que desejamos observar
+betelgeuse = SkyCoord.from_name('Betelgeuse')
+betelgeuse_local = betelgeuse.transform_to(frame_local_24h)
+```
+
+```{python}
+# time-dependent coordinates of the Sun in equatorial system
+sun = get_sun(time)
+sun_local = sun.transform_to(frame_local_24h)
+```
+
+```{python, results='hide'}
+elapsed_night = elapsed[np.where(sun_local.alt<0)]
+betelgeuse_night = \
+  betelgeuse_local.alt[np.where(sun_local.alt<0)]
+  
+plt.figure(figsize=(8, 4.5))
+plt.plot(
+  elapsed.to(u.h), sun_local.alt, color='orange', label='Sol'
+)
+plt.plot(
+  elapsed.to(u.h), betelgeuse_local.alt, color='red', 
+  linestyle=':', label='Betelgeuse (dia)'
+)
+plt.plot(
+  elapsed_night.to(u.h), betelgeuse_night, color='red',
+  label='Betelgeuse (noite)'
+)
+
+plt.xlabel("Tempo a partir do meio-dia [h]")
+plt.xlim(0, 24)
+plt.xticks(np.arange(13)*2)
+
+#plt.ylim(0, 80)
+plt.ylabel('Altitude [deg]')
+plt.legend(loc='upper right')
+
+plt.grid(ls='dashed')
+plt.tight_layout()
+plt.savefig("figure/chap-02/altitude_sol_betelgeuse_palmas_br.pdf")
+plt.close()
+```
+
+\begin{figure}[H]
+  \centering
+  \caption{Altitude do Sol e da estrela Betelgeuse vista de Palmas-TO}
+  \includegraphics[width=\textwidth]{figure/chap-02/altitude_sol_betelgeuse_palmas_br.pdf}
+\end{figure}
+
+
+
+
+
+
+
 
 
