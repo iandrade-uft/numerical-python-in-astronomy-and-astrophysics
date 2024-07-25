@@ -381,12 +381,3 @@ plt.close()
   \caption{Altitude do Sol e da estrela Betelgeuse vista de Palmas-TO}
   \includegraphics[width=\textwidth]{figure/chap-02/altitude_sol_betelgeuse_palmas_br.pdf}
 \end{figure}
-
-
-
-
-
-
-
-
-

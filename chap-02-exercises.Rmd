@@ -1,0 +1,106 @@
+---
+title: "Título"
+author: "Igo da Costa Andrade"
+
+# Metadados
+booktitle: "Numerical Python in stronomy and Astrophysics"
+booksubtitle: "A practical guide to astrophysical problem solving"
+bookauthors: "Schmidt, W.; Völschow, M"
+bookaddres: "Switzerland"
+bookpublisher: "Springer"
+bookyear: "2021"
+chaptertitle: "Computação e exibição de dados"
+chapternumber: "2"
+maincolor: "004776"
+
+output: 
+  bookdown::pdf_document2:
+    template: template.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_python("~/anaconda3/envs/astro39/bin/python")
+```
+
+
+\section*{Exercícios}
+
+\begin{enumerate}
+  \item Compute a declinação do Sol para os equinócios e solstícios usando apenas funções trigonométricas do módulo \verb|math| em um loop \verb|for| explícito. Imprima os resultados e cheque se eles concordam com os valores computados usando NumPy nesta seção. Este exercício ajuda a compreender o que está por trás de um loop impícito.\\
+\end{enumerate}
+  \iniSol
+  Variação anual da declinação do sol:
+  $$
+  \delta_{\odot} = -\arcsin{\left[\sin{\epsilon_0 \cos{\left(\dfrac{360^\circ}{365.24}\right)(N+10)}}\right]}
+  $$
+
+```{python}
+import math
+from datetime import datetime, timedelta
+
+year = 2024
+jan1st = datetime(year,1,1)
+eventos = [
+  {
+    "nome": "Equinócio de outono",
+    "data": datetime(year,3,20)
+  },
+  {
+    "nome": "Solstício de inverno",
+    "data": datetime(year,6,20)
+  },
+  {
+    "nome": "Equinócio de primavera",
+    "data": datetime(year,9,22)
+  },
+  {
+    "nome": "Solstício de verão",
+    "data": datetime(year,12,21)
+  }
+]
+
+
+omega = 2*math.pi/365.24
+ecl = math.radians(23.44)
+for evento in eventos:
+  diff = evento['data'] - jan1st
+  N = diff.days
+  delta = -math.asin(math.sin(ecl) * math.cos(omega * (N+10)))
+  print(f"{evento['nome']} ({evento['data'].strftime('%d/%m/%Y')})")
+  print(f"Declinação = {math.degrees(delta):.2f} deg.")
+```
+  \fimSol
+  
+
+
+\begin{enumerate}[resume]
+  \item O contador do dia $N$ na Eq. (2.1) pode ser calculado para uma data com a ajuda do módulo \verb|datetime|. Por exemplo, o dia de equinócio vernal mp ano de 2020 é dado por
+  
+
+\verb|import datetime|
+
+\verb|vernal_equinox = datetime.date(2020, 3, 20) - \ |
+
+\verb|                 datetime.date(2020, 1,  1)|
+
+
+Então \verb|vernal_equinox.days| resulta em 79. Defina um array \verb|N| (equinócios e solstícios) usando datetime.
+\end{enumerate}
+
+
+\iniSol
+```{python}
+import datetime
+import numpy as np
+
+N = np.array([
+  (datetime.date(2024, m, d)-datetime.date(2024,1,1)).days for m, d \
+    in zip([3, 6, 9, 12],[20, 20, 22, 21])
+])
+print(N)
+```
+
+\fimSol
+

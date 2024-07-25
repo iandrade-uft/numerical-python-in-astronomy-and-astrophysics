@@ -12,6 +12,7 @@
 \usepackage{enumitem}
 \usepackage{indentfirst}
 \usepackage{float}
+\usepackage{verbatim}
 
 \usepackage{tikz}
 %\usetikzlibrary{patterns,snakes}
@@ -26,9 +27,6 @@
                                      {\normalfont\large\bfseries}}
 \makeatother
 
-
-% Definir leftmargin=* para todos os ambientes enumerate
-\setlist[enumerate,1]{leftmargin=*, resume, label=\textbf{\arabic*}}
 
 
 
@@ -97,6 +95,11 @@ $if(maincolor)$
 $else$
 \definecolor{mainColor}{HTML}{01796F}
 $endif$
+
+% Definir leftmargin=* para todos os ambientes enumerate
+\setlist[enumerate,1]{leftmargin=*, resume, label=\textbf{\chapternumber.\arabic*}}
+
+
 
 
 % Identação do parágrafo
