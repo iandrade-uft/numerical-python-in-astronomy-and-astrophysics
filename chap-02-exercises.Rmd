@@ -161,3 +161,128 @@ print(tbl)
 
 \fimSol
 
+\begin{enumerate}[resume]
+  \item A maior altitude $a_{amx}$  (também conhecida como culminação superior) de uma estrela medida a partir do plano horizontal de um observador na Terra é dada por:
+  \begin{align*}
+  a_{max} = 
+  \begin{cases}
+    90^{\circ} - \phi + \delta; \quad \text{se} \ \phi \geq \delta,\\
+    90^{\circ} + \phi - \delta; \quad \text{se} \ \phi < \delta 
+  \end{cases}
+  \end{align*}
+  
+  onde $\phi$ é a latitude do observador e $\delta$ é a declinação da estrela. Calcule $a_{max}$ na sua localização atual para as estrelas: Polaris ($\delta = 89^{\circ}15^{\prime}51^{\prime\prime}$), Betelgeuse ($\delta = + 07^{\circ}24^{\prime}25^{\prime \prime}$) e Rigel ($\delta = -08^{\circ}12^{\prime}15^{\prime\prime}$) e Sirius A ($\delta = -16^{\circ}42^{\prime}58^{\prime\prime}$). Para conseguir os dois casos na  (Eq. 2.3), use a função \verb|where()| de numpy. Por exemplo,
+  
+  \verb|np.where(phi <= delta, phi-delta, phi+delta)|
+  
+  compara \verb|phi| e \verb|delta| elemento por elemento e retorna um \textit{array} com elementos de \verb|phi-delta| se a condição \verb|phi <= delta| é verdadeira e elementos de \verb|phi+delta|  caso contrário. Imprima os resultados com o número apropriado de dígitos significativos junto com as declinações.
+\end{enumerate}
+  
+\iniSol
+
+```{python}
+import pandas as pd
+stars = [
+  {
+    "name": "Polaris", "sgn": "+", "D": 89, "M": 15, "S": 51
+  },
+  {
+    "name": "Betelgeuse", "sgn": "+", "D": 7, "M": 24, "S": 25
+  },
+  {
+    "name": "Rigel", "sgn": "-", "D": 8, "M": 12, "S": 15
+  }, 
+  {
+    "name": "Sirius A", "sgn": "-", "D": 16, "M": 42, "S": 58  
+  }
+]
+for i, star in enumerate(stars):
+  star["DMS"] = 0
+  for j, label in enumerate(["D", "M", "S"]):
+    star["DMS"] += star[label]/60**j
+    if star["sgn"] == "-":
+      star["DMS"] *= -1
+  stars[i] = star
+  
+stars_df = pd.DataFrame(stars)
+
+location = {
+  "name": "Palmas",
+  "lat": {
+    "sgn": "-", "D": 10, "M":10, "S":2
+  },
+  "lon": {
+    "sgn": "-", "D": 48, "M":19, "39":2
+  }
+}
+
+
+delta = stars_df["DMS"]
+phi = sum(location["lat"][label]/60**i for i, label in enumerate(["D", "M", "S"]))
+phi = phi if location["lat"]["sgn"]=="+" else -phi
+phi
+
+upper_culmination = 90 + np.where(phi>=delta, -phi+delta, phi-delta)
+
+stars_df["upper_culmination"] = upper_culmination
+stars_df
+```
+
+
+\fimSol
+
+\begin{enumerate}[resume]
+  \item Um dia sideral é aproximadamente 3 min 56 s mais curto que um dia solar (24 h). Mostrq que isso implica em $1^{h} \approx 0,9973$ h. Como você poderia modificar a definição de $T$ na Sec. 2.1.2 para fazer uso desse fator sem uttilizar Astroppy unitis?
+\end{enumerate}
+
+\iniSol
+  \begin{align*}
+  1^{h} &= \dfrac{24\text{h} - (3\text{min}56\text{s})}{24\text{h}} = \dfrac{24\text{h} - \left(\dfrac{3}{60}\text{h} + \dfrac{56}{3600}\text{h}\right)}{24\text{h}} \approx `r round((24-(3/60+56/3600))/24, 4)` \text{h}
+  \end{align*}
+\fimSol
+
+\begin{enumerate}[resume]
+  \item Calcule e faça o gráfico da variação anual da duração do dia na sua localização geográfica, utilizando tanto a fórmula com correção de excentricidade do Exercício 2.3 quanto a função \verb|get_sun()| de \verb|SkyCoord|. Qual é o tamanho do desvio? Como seu resultado se compara com outros lugares mostrados na Fig. 2.5?
+\end{enumerate}
+
+\iniSol
+```{python}
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.coordinates import SkyCoord, EarthLocation
+import astropy.units as u
+
+
+# Posição geográfica Palmas (Tocantins)
+obs = EarthLocation(
+  lat=-10*u.deg-10*u.arcmin-8*u.arcsec,
+  lon=-48*u.deg-19*u.arcmin-54*u.arcsec
+)
+  
+phi = obs.lat
+
+N = np.arange(365) # array com elementos 0, 1, 2, ..., 364
+omega = 2*math.pi/365.24 # Velocidade angular da Terra
+ecl = math.radians(23.44) # Obliquidade da Eclípitica
+
+# cálculo da decinação do Sol para cada dia do ano
+delta = -np.arcsin(math.sin(ecl) * np.cos(omega*(N+10)))
+# Cálculo da duração do dia em horas solares
+h = np.arccos(-np.tan(delta) * math.tan(phi.radian))
+T = (np.degrees(2*h)/360) * u.sday.to(u.h)
+
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.plot(N, T)
+ax.set_xlabel("Dia")
+ax.set_ylabel("Duração do Dia (h)")
+ax.set_title("Variação anual da duração do dia em Palmas (TO)")
+plt.grid(ls="dashed")
+plt.show()
+
+```
+\fimSol
+  
+  
+
+
